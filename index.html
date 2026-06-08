@@ -167,6 +167,7 @@
       .brand-title { font-size: 28px; }
       
       .nav { display: none; }
+
       .mobile-bottom-nav { display: flex; }
       .mobile-profile-btn { display: block; }
 
@@ -258,7 +259,7 @@
     </div>
 
     <div class="auth-card" id="register-block" style="display: none;">
-      <h2>Регистрация</h2>
+      <h2>Registration</h2>
       <form class="auth-form" id="registerForm">
         <input type="text" id="regName" placeholder="Ваше имя" required />
         <input type="email" id="regEmail" placeholder="Укажите Email" required />
@@ -384,23 +385,13 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { 
-      getFirestore, 
-      doc, 
-      setDoc, 
-      collection, 
-      addDoc, 
-      onSnapshot, 
-      query, 
-      orderBy, 
-      deleteDoc,
-      getDocs
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAKBaeuSIHvR-eGyhksVYIGv1cEbHwnEzo",
       authDomain: "myfitstats-211cd.firebaseapp.com",
+      databaseURL: "https://myfitstats-211cd-default-rtdb.firebaseio.com",
       projectId: "myfitstats-211cd",
       storageBucket: "myfitstats-211cd.firebasestorage.app",
       messagingSenderId: "992114919068",
@@ -409,11 +400,11 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getDatabase(app);
     const auth = getAuth(app);
 
     let currentUser = null;
-    let activeListeners = [];
+    let dbListenerRef = null;
 
     let state = {
       training: [],
@@ -427,10 +418,6 @@
       const headerBtn = document.getElementById('headerAuthBtn');
       const mobileBtn = document.getElementById('mobileAuthBtn');
       
-      // Отписываемся от старых слушателей при смене сессии
-      activeListeners.forEach(unsub => unsub());
-      activeListeners = [];
-
       if (user) {
         const textOut = `Выйти (${user.email.split('@')[0]})`;
         headerBtn.textContent = textOut;
@@ -441,33 +428,19 @@
         mobileBtn.style.background = "#ffcccc";
         mobileBtn.style.borderColor = "#ff9999";
         
-        // 1. Слушатель реального времени для коллекции тренировок (сортировка по дате)
-        const trainQuery = query(collection(db, `users/${user.uid}/trainings`), orderBy("date", "asc"));
-        const unsubTrain = onSnapshot(trainQuery, (snapshot) => {
-          state.training = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          renderAll();
-        }, () => showToast("Ошибка загрузки тренировок"));
-        activeListeners.push(unsubTrain);
-
-        // 2. Слушатель реального времени для коллекции питания
-        const nutrQuery = query(collection(db, `users/${user.uid}/nutrition`), orderBy("date", "asc"));
-        const unsubNutr = onSnapshot(nutrQuery, (snapshot) => {
-          state.nutrition = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          if (state.selectedNutritionIndex >= state.nutrition.length) {
-            state.selectedNutritionIndex = Math.max(0, state.nutrition.length - 1);
+        // Чтение данных из ветки default/${user.uid}/fitData вместо users
+        const userDbRef = ref(db, `default/${user.uid}/fitData`);
+        dbListenerRef = onValue(userDbRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            state.training = data.training || [];
+            state.nutrition = data.nutrition || [];
+            state.body = data.body || [];
+          } else {
+            state.training = []; state.nutrition = []; state.body = [];
           }
           renderAll();
-        }, () => showToast("Ошибка загрузки питания"));
-        activeListeners.push(unsubNutr);
-
-        // 3. Слушатель реального времени для коллекции замеров тела
-        const bodyQuery = query(collection(db, `users/${user.uid}/body`), orderBy("date", "asc"));
-        const unsubBody = onSnapshot(bodyQuery, (snapshot) => {
-          state.body = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          renderAll();
-        }, () => showToast("Ошибка загрузки замеров"));
-        activeListeners.push(unsubBody);
-
+        });
       } else {
         headerBtn.textContent = "Вход / Регистрация";
         headerBtn.style.background = "#d6f1dc";
@@ -483,12 +456,14 @@
       }
     });
 
-    // Изменение ячейки таблицы "на лету" (Inline редактирование)
-    function updateDocument(subCollection, docId, updatedFields) {
-      if (!currentUser || !docId) return;
-      const docRef = doc(db, `users/${currentUser.uid}/${subCollection}`, docId);
-      setDoc(docRef, updatedFields, { merge: true })
-        .catch(() => showToast("Ошибка обновления данных в Firestore"));
+    function syncWithFirebase() {
+      if (!currentUser) return showToast("Ошибка: Вы не авторизованы!");
+      // Сохранение данных в ветку default вместо users
+      set(ref(db, `default/${currentUser.uid}/fitData`), {
+        training: state.training,
+        nutrition: state.nutrition,
+        body: state.body
+      }).catch(err => showToast("Ошибка синхронизации"));
     }
 
     window.handleHeaderAuthClick = function() {
@@ -520,11 +495,10 @@
       createUserWithEmailAndPassword(auth, email, pass)
         .then((userCredential) => {
           const uid = userCredential.user.uid;
-          const userDocRef = doc(db, `users/${uid}`);
-          
-          setDoc(userDocRef, {
-            profile: { name: name, email: email, createdAt: new Date().toISOString() }
-          }, { merge: true }).then(() => {
+          // Регистрация профиля в ветку default вместо users
+          set(ref(db, `default/${uid}/profile`), {
+            name: name, email: email, createdAt: new Date().toISOString()
+          }).then(() => {
             showToast('Аккаунт успешно создан!');
             switchTab('home');
             document.getElementById('registerForm').reset();
@@ -700,17 +674,17 @@
     function renderAll() {
       renderTable('training', (row, idx) => {
         const tr = document.createElement('tr');
-        tr.insertCell().appendChild(createCell(row.name, v => updateDocument('trainings', row.id, { name: v })));
-        tr.insertCell().appendChild(createCell(row.value, v => updateDocument('trainings', row.id, { value: v })));
-        tr.insertCell().appendChild(createCell(row.unit || 'шаги', v => updateDocument('trainings', row.id, { unit: v })));
-        tr.insertCell().appendChild(createCell(fmtDate(row.date), v => updateDocument('trainings', row.id, { date: v })));
+        tr.insertCell().appendChild(createCell(row.name, v => { state.training[idx].name = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.value, v => { state.training[idx].value = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.unit || 'шаги', v => { state.training[idx].unit = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(fmtDate(row.date), v => { state.training[idx].date = v; syncWithFirebase(); }));
         return tr;
       });
 
       renderTable('nutrition', (row, idx) => {
         const tr = document.createElement('tr');
         ['breakfast', 'lunch', 'dinner'].forEach(k => {
-          tr.insertCell().appendChild(createCell(row[k], v => updateDocument('nutrition', row.id, { [k]: v })));
+          tr.insertCell().appendChild(createCell(row[k], v => { state.nutrition[idx][k] = v; syncWithFirebase(); }));
         });
         const btn = document.createElement('button'); btn.className = `date-pill ${idx === state.selectedNutritionIndex ? 'active' : ''}`;
         btn.textContent = fmtDate(row.date) || '---';
@@ -721,10 +695,10 @@
 
       renderTable('body', (row, idx) => {
         const tr = document.createElement('tr');
-        tr.insertCell().appendChild(createCell(row.current, v => updateDocument('body', row.id, { current: v })));
-        tr.insertCell().appendChild(createCell(row.height, v => updateDocument('body', row.id, { height: v })));
-        tr.insertCell().appendChild(createCell(row.target, v => updateDocument('body', row.id, { target: v })));
-        tr.insertCell().appendChild(createCell(fmtDate(row.date), v => updateDocument('body', row.id, { date: v })));
+        tr.insertCell().appendChild(createCell(row.current, v => { state.body[idx].current = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.height, v => { state.body[idx].height = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.target, v => { state.body[idx].target = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(fmtDate(row.date), v => { state.body[idx].date = v; syncWithFirebase(); }));
         return tr;
       });
 
@@ -738,13 +712,7 @@
       const unit = document.getElementById('trainingUnitInput').value;
       const date = document.getElementById('trainingDateInput').value;
       if(!name && !value && !date) return showToast('Заполните поля');
-      
-      addDoc(collection(db, `users/${currentUser.uid}/trainings`), { name, value, unit, date })
-        .then(() => {
-          document.getElementById('trainingNameInput').value = '';
-          document.getElementById('trainingValueInput').value = '';
-        })
-        .catch(() => showToast("Ошибка добавления тренировки"));
+      state.training.push({ name, value, unit, date }); syncWithFirebase();
     }
 
     window.addNutrition = function() {
@@ -753,15 +721,9 @@
       const lunch = document.getElementById('lunchInput').value.trim();
       const dinner = document.getElementById('dinnerInput').value.trim();
       const date = document.getElementById('nutritionDateInput').value;
-      if(!date) return showToast('Укажите дату!');
-      
-      addDoc(collection(db, `users/${currentUser.uid}/nutrition`), { breakfast, lunch, dinner, date })
-        .then(() => {
-          document.getElementById('breakfastInput').value = '';
-          document.getElementById('lunchInput').value = '';
-          document.getElementById('dinnerInput').value = '';
-        })
-        .catch(() => showToast("Ошибка добавления питания"));
+      state.nutrition.push({ breakfast, lunch, dinner, date });
+      state.selectedNutritionIndex = state.nutrition.length - 1;
+      syncWithFirebase();
     }
 
     window.addBody = function() {
@@ -770,36 +732,21 @@
       const height = document.getElementById('currentHeightInput').value.trim();
       const target = document.getElementById('targetWeightInput').value.trim();
       const date = document.getElementById('bodyDateInput').value;
-      if(!date) return showToast('Укажите дату!');
-      
-      addDoc(collection(db, `users/${currentUser.uid}/body`), { current, height, target, date })
-        .then(() => {
-          document.getElementById('currentWeightInput').value = '';
-          document.getElementById('currentHeightInput').value = '';
-          document.getElementById('targetWeightInput').value = '';
-        })
-        .catch(() => showToast("Ошибка добавления замеров"));
+      state.body.push({ current, height, target, date }); syncWithFirebase();
     }
 
     window.removeLast = function(key) {
       if(!currentUser || !state[key].length) return;
-      const lastItem = state[key][state[key].length - 1];
-      const firestoreNameMap = { 'training': 'trainings', 'nutrition': 'nutrition', 'body': 'body' };
-      
-      const docRef = doc(db, `users/${currentUser.uid}/${firestoreNameMap[key]}`, lastItem.id);
-      deleteDoc(docRef).catch(() => showToast("Ошибка при удалении строки"));
+      state[key].pop();
+      if(key === 'nutrition') state.selectedNutritionIndex = Math.max(0, state.nutrition.length - 1);
+      syncWithFirebase();
     }
 
     window.clearData = function(key) {
-      if(!currentUser || !confirm("Вы уверены, что хотите полностью очистить эту категорию?")) return;
-      const firestoreNameMap = { 'training': 'trainings', 'nutrition': 'nutrition', 'body': 'body' };
-      
-      const colRef = collection(db, `users/${currentUser.uid}/${firestoreNameMap[key]}`);
-      getDocs(colRef).then((snapshot) => {
-        snapshot.docs.forEach((docSnap) => {
-          deleteDoc(doc(db, `users/${currentUser.uid}/${firestoreNameMap[key]}`, docSnap.id));
-        });
-      }).catch(() => showToast("Ошибка при очистке данных"));
+      if(!currentUser) return;
+      state[key] = [];
+      if(key === 'nutrition') state.selectedNutritionIndex = 0;
+      syncWithFirebase();
     }
   </script>
 </body>
