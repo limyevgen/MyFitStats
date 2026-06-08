@@ -361,7 +361,7 @@
         mobileBtn.textContent = "🚪 Выход";
         mobileBtn.style.background = "#ffcccc"; mobileBtn.style.borderColor = "#ff9999";
         
-        // Включаем слушатели на КОРНЕВЫЕ коллекции
+        // Включаем независимое отслеживание всех трех корневых путей
         setupCollectionListener('training');
         setupCollectionListener('nutrition');
         setupCollectionListener('body');
@@ -377,7 +377,7 @@
       }
     });
 
-    // Путь изменен на корневой: {rootCollection}/{userId}/records/{documentId}
+    // Строит путь вида: /training/{userId}/records/{docId}, /nutrition/{userId}/records/{docId} и т.д.
     function setupCollectionListener(key) {
       const colRef = collection(db, key, currentUser.uid, "records");
       const q = query(colRef, orderBy("date", "asc"));
@@ -388,7 +388,7 @@
           state.selectedNutritionIndex = state.nutrition.length - 1;
         }
         renderAll();
-      }, (err) => console.error(`Ошибка подписки на ${key}:`, err));
+      }, (err) => console.error(`Ошибка чтения ${key}:`, err));
       
       unsubscribes.push(unsub);
     }
@@ -398,10 +398,10 @@
       try {
         const colRef = collection(db, key, currentUser.uid, "records");
         await addDoc(colRef, data);
-        showToast("Запись сохранена!");
+        showToast("Запись добавлена в базу!");
       } catch (err) {
         console.error(err);
-        showToast("Ошибка сохранения");
+        showToast("Ошибка сохранения в Firebase");
       }
     }
 
@@ -421,7 +421,7 @@
       try {
         const docRef = doc(db, key, currentUser.uid, "records", docId);
         await deleteDoc(docRef);
-        showToast("Запись удалена");
+        showToast("Запись успешно удалена");
       } catch (err) {
         console.error(err);
       }
@@ -435,7 +435,7 @@
         const snapshot = await getDocs(colRef);
         const promises = snapshot.docs.map(d => deleteDoc(d.ref));
         await Promise.all(promises);
-        showToast("Таблица полностью очищена");
+        showToast("Таблица очищена");
       } catch (err) {
         console.error(err);
       }
@@ -446,7 +446,7 @@
       const value = document.getElementById('trainingValueInput').value.trim();
       const unit = document.getElementById('trainingUnitInput').value;
       const date = document.getElementById('trainingDateInput').value;
-      if(!name || !value || !date) return showToast('Заполните все пустые поля!');
+      if(!name || !value || !date) return showToast('Заполните поля!');
       addRecord('training', { name, value, unit, date });
     }
 
@@ -455,7 +455,7 @@
       const lunch = document.getElementById('lunchInput').value.trim() || "0";
       const dinner = document.getElementById('dinnerInput').value.trim() || "0";
       const date = document.getElementById('nutritionDateInput').value;
-      if(!date) return showToast('Укажите дату!');
+      if(!date) return showToast('Укажите корректную дату!');
       addRecord('nutrition', { breakfast, lunch, dinner, date });
     }
 
@@ -464,13 +464,13 @@
       const height = document.getElementById('currentHeightInput').value.trim();
       const target = document.getElementById('targetWeightInput').value.trim();
       const date = document.getElementById('bodyDateInput').value;
-      if(!current || !height || !date) return showToast('Заполните обязательные поля!');
+      if(!current || !height || !date) return showToast('Введите вес, рост и дату!');
       addRecord('body', { current, height, target, date });
     }
 
     window.handleHeaderAuthClick = function() {
       if (currentUser) {
-        signOut(auth).then(() => { showToast("Вы успешно вышли."); switchTab('home'); }).catch(() => showToast("Ошибка выхода"));
+        signOut(auth).then(() => { showToast("До свидания!"); switchTab('home'); }).catch(() => showToast("Ошибка"));
       } else {
         switchTab('auth-tab');
       }
@@ -482,18 +482,18 @@
       const name = document.getElementById('regName').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const pass = document.getElementById('regPass').value;
-      if (pass.length < 6) return showToast('Пароль должен содержать не менее 6 знаков!');
+      if (pass.length < 6) return showToast('Пароль от 6 символов!');
       createUserWithEmailAndPassword(auth, email, pass).then((cred) => {
         setDoc(doc(db, "users", cred.user.uid), { name, email, createdAt: new Date().toISOString() });
-        showToast('Аккаунт успешно создан!'); switchTab('home');
+        showToast('Аккаунт создан!'); switchTab('home');
       }).catch(err => showToast(err.message));
     });
 
     document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
       signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value.trim(), document.getElementById('loginPass').value)
-        .then(() => { showToast('Успешный вход в систему.'); switchTab('home'); })
-        .catch(() => showToast('Неверный логин или пароль!'));
+        .then(() => { showToast('Вход выполнен.'); switchTab('home'); })
+        .catch(() => showToast('Ошибка логина/пароля'));
     });
 
     window.switchTab = function(id) {
@@ -522,7 +522,7 @@
       if(box) {
         box.style.opacity = currentUser ? '1' : '0.25';
         box.style.pointerEvents = currentUser ? 'all' : 'none';
-        if(!currentUser) showToast("Для записи данных необходимо войти.");
+        if(!currentUser) showToast("Для работы с данными войдите в аккаунт.");
       }
       renderAll();
     }
