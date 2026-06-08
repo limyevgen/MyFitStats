@@ -162,14 +162,11 @@
 
     /* Адаптивные медиа-запросы для мобильных устройств */
     @media (max-width: 992px) {
-      body { padding-bottom: 85px; } /* Добавляем отступ снизу, чтобы контент не перекрывался меню */
+      body { padding-bottom: 85px; }
       .site-header { padding: 15px 20px; min-height: 70px; }
       .brand-title { font-size: 28px; }
       
-      /* Скрываем ПК-навигацию */
       .nav { display: none; }
-
-      /* Показываем аккуратную нижнюю панель и мобильный профиль */
       .mobile-bottom-nav { display: flex; }
       .mobile-profile-btn { display: block; }
 
@@ -261,7 +258,7 @@
     </div>
 
     <div class="auth-card" id="register-block" style="display: none;">
-      <h2>Registration</h2>
+      <h2>Регистрация</h2>
       <form class="auth-form" id="registerForm">
         <input type="text" id="regName" placeholder="Ваше имя" required />
         <input type="email" id="regEmail" placeholder="Укажите Email" required />
@@ -387,14 +384,12 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // Обновлённая конфигурация Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAKBaeuSIHvR-eGyhksVYIGv1cEbHwnEzo",
       authDomain: "myfitstats-211cd.firebaseapp.com",
-      databaseURL: "https://myfitstats-211cd-default-rtdb.firebaseio.com",
       projectId: "myfitstats-211cd",
       storageBucket: "myfitstats-211cd.firebasestorage.app",
       messagingSenderId: "992114919068",
@@ -403,11 +398,11 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    const db = getFirestore(app);
     const auth = getAuth(app);
 
     let currentUser = null;
-    let dbListenerRef = null;
+    let unsubscribeFirestore = null;
 
     let state = {
       training: [],
@@ -416,7 +411,6 @@
       selectedNutritionIndex: 0
     };
 
-    // Отслеживание состояния авторизации
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       const headerBtn = document.getElementById('headerAuthBtn');
@@ -432,10 +426,11 @@
         mobileBtn.style.background = "#ffcccc";
         mobileBtn.style.borderColor = "#ff9999";
         
-        const userDbRef = ref(db, `users/${user.uid}/fitData`);
-        dbListenerRef = onValue(userDbRef, (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
+        // Отслеживание изменений документа пользователя в Firestore
+        const userDocRef = doc(db, `users/${user.uid}`);
+        unsubscribeFirestore = onSnapshot(userDocRef, (docSnap) => {
+          if (docSnap.exists() && docSnap.data().fitData) {
+            const data = docSnap.data().fitData;
             state.training = data.training || [];
             state.nutrition = data.nutrition || [];
             state.body = data.body || [];
@@ -443,8 +438,15 @@
             state.training = []; state.nutrition = []; state.body = [];
           }
           renderAll();
+        }, (err) => {
+          showToast("Ошибка при получении данных Firestore");
         });
       } else {
+        if (unsubscribeFirestore) {
+          unsubscribeFirestore();
+          unsubscribeFirestore = null;
+        }
+
         headerBtn.textContent = "Вход / Регистрация";
         headerBtn.style.background = "#d6f1dc";
         headerBtn.style.borderColor = "#6175ca";
@@ -461,11 +463,20 @@
 
     function syncWithFirebase() {
       if (!currentUser) return showToast("Ошибка: Вы не авторизованы!");
-      set(ref(db, `users/${currentUser.uid}/fitData`), {
-        training: state.training,
-        nutrition: state.nutrition,
-        body: state.body
-      }).catch(err => showToast("Ошибка синхронизации"));
+      
+      const userDocRef = doc(db, `users/${currentUser.uid}`);
+      // Сохраняем структуру fitData в документ пользователя
+      setDoc(userDocRef, {
+        fitData: {
+          training: state.training,
+          nutrition: state.nutrition,
+          body: state.body
+        }
+      }, { merge: true }) // merge: true чтобы не затереть профиль (имя, дату создания)
+      .catch(err => {
+        console.error(err);
+        showToast("Ошибка синхронизации Firestore");
+      });
     }
 
     window.handleHeaderAuthClick = function() {
@@ -479,7 +490,6 @@
       }
     }
 
-    // Переназначим мобильную кнопку на логику десктопной
     document.getElementById('mobileAuthBtn').onclick = function() {
       window.handleHeaderAuthClick();
     };
@@ -498,9 +508,11 @@
       createUserWithEmailAndPassword(auth, email, pass)
         .then((userCredential) => {
           const uid = userCredential.user.uid;
-          set(ref(db, `users/${uid}/profile`), {
-            name: name, email: email, createdAt: new Date().toISOString()
-          }).then(() => {
+          const userDocRef = doc(db, `users/${uid}`);
+          
+          setDoc(userDocRef, {
+            profile: { name: name, email: email, createdAt: new Date().toISOString() }
+          }, { merge: true }).then(() => {
             showToast('Аккаунт успешно создан!');
             switchTab('home');
             document.getElementById('registerForm').reset();
@@ -533,12 +545,9 @@
       const activeTab = document.getElementById(tabId);
       if(activeTab) activeTab.classList.add('active');
 
-      // Управление подсветкой активного элемента в мобильном меню
       document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
       if (tabId === 'home') {
         document.getElementById('mNavHome').classList.add('active');
-      } else if (tabId === 'auth-tab') {
-        // Убираем подсветку со всех, если зашли в профиль
       }
     }
 
@@ -548,7 +557,6 @@
     }
 
     window.openModal = function(id) {
-      // Подсвечиваем соответствующую иконку в таб-баре при открытии окна
       document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
       if (id === 'trainingModal') document.getElementById('mNavTrain').classList.add('active');
       if (id === 'nutritionModal') document.getElementById('mNavNutr').classList.add('active');
@@ -582,7 +590,6 @@
       const modal = document.getElementById(id);
       modal.classList.remove('show');
       setTimeout(() => modal.style.display = 'none', 250);
-      // Возвращаем фокус на главную в таббаре при закрытии модалки
       const activeTab = document.querySelector('.tab-content.active');
       if (activeTab && activeTab.id === 'home') {
         document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
