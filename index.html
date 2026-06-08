@@ -67,28 +67,15 @@
       gap: 4px;
       transition: color 0.2s ease;
     }
-    .mobile-nav-item .icon {
-      font-size: 20px;
-    }
-    .mobile-nav-item.active {
-      color: var(--blue);
-      font-weight: bold;
-    }
+    .mobile-nav-item .icon { font-size: 20px; }
+    .mobile-nav-item.active { color: var(--blue); font-weight: bold; }
 
-    /* Мобильная кнопка профиля в хедере */
     .mobile-profile-btn {
-      display: none;
-      background: #d6f1dc;
-      border: 2px solid #6175ca;
-      padding: 8px 12px;
-      border-radius: 10px;
-      color: var(--blue);
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
+      display: none; background: #d6f1dc; border: 2px solid #6175ca;
+      padding: 8px 12px; border-radius: 10px; color: var(--blue); font-weight: bold; font-size: 14px; cursor: pointer;
     }
 
-    /* Вкладки (Табы) */
+    /* Вкладки */
     .tab-content { display: none; max-width: 1100px; margin: 40px auto; padding: 20px; }
     .tab-content.active { display: grid; grid-template-columns: 45% 55%; gap: 40px; align-items: center; }
     #auth-tab.active { display: block; max-width: 450px; }
@@ -99,7 +86,6 @@
     .home-content h1 { font-size: 48px; color: var(--blue); margin-bottom: 20px; font-family: Georgia, serif; }
     .home-text { font-size: 20px; line-height: 1.5; margin-bottom: 20px; }
 
-    /* Карточки категорий на Главной */
     .stats-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
     .feature-card { background: #fff; padding: 20px; border-radius: 16px; border: 2px solid rgba(87,114,204,0.15); cursor: pointer; transition: 0.2s; }
     .feature-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
@@ -119,7 +105,6 @@
     .row-actions button { background: #7e91df; margin-top: 10px; width: 100%; }
     .hint { font-size: 13px; color: #5f6d91; margin-bottom: 10px; }
 
-    /* Адаптивные контейнеры для таблиц */
     .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 10px; border-radius: 8px; border: 1px solid rgba(87,114,204,0.3); }
     .section-table { width: 100%; border-collapse: collapse; font-size: 16px; background: #fff; overflow: hidden; }
     .section-table th, .section-table td { border: 1px solid rgba(87,114,204,0.3); padding: 12px; text-align: center; white-space: nowrap; }
@@ -160,7 +145,6 @@
     .toast { position: fixed; right: 20px; bottom: 80px; z-index: 3000; background: rgba(55, 75, 159, 0.95); color: white; padding: 12px 20px; border-radius: 10px; font-size: 14px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: 0.25s; }
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    /* Адаптивные медиа-запросы */
     @media (max-width: 992px) {
       body { padding-bottom: 85px; }
       .site-header { padding: 15px 20px; min-height: 70px; }
@@ -189,56 +173,39 @@
     <a class="brand" href="#" onclick="switchTab('home')">
       <div class="brand-title">MyFitStats</div>
     </a>
-    
     <nav class="nav" id="mainNav">
       <button class="nav-link" onclick="openModal('trainingModal')">Дневник тренировок</button>
       <button class="nav-link" onclick="openModal('nutritionModal')">Дневник питания</button>
       <button class="nav-link" onclick="openModal('bodyModal')">Оценка тела</button>
       <button class="login-button" id="headerAuthBtn" onclick="handleHeaderAuthClick()">Вход / Регистрация</button>
     </nav>
-
     <button class="mobile-profile-btn" id="mobileAuthBtn" onclick="switchTab('auth-tab')">👤 Вход</button>
   </header>
 
   <nav class="mobile-bottom-nav">
     <button class="mobile-nav-item active" id="mNavHome" onclick="switchTab('home')">
-      <span class="icon">🏠</span>
-      <span>Главная</span>
+      <span class="icon">🏠</span><span>Главная</span>
     </button>
     <button class="mobile-nav-item" id="mNavTrain" onclick="openModal('trainingModal')">
-      <span class="icon">🏃‍♂️</span>
-      <span>Тренировки</span>
+      <span class="icon">🏃‍♂️</span><span>Тренировки</span>
     </button>
     <button class="mobile-nav-item" id="mNavNutr" onclick="openModal('nutritionModal')">
-      <span class="icon">🍏</span>
-      <span>Питание</span>
+      <span class="icon">🍏</span><span>Питание</span>
     </button>
     <button class="mobile-nav-item" id="mNavBody" onclick="openModal('bodyModal')">
-      <span class="icon">⚖️</span>
-      <span>Замеры</span>
+      <span class="icon">⚖️</span><span>Замеры</span>
     </button>
   </nav>
 
   <section class="tab-content active" id="home">
-    <div class="pane-left">
-      <img class="hero-image" src="парень(1).png" alt="Спортсмен" />
-    </div>
+    <div class="pane-left"><img class="hero-image" src="парень(1).png" alt="Спортсмен" /></div>
     <div class="home-content">
       <h1>MyFitStats</h1>
       <p class="home-text">Удобный интерактивный дневник для контроля ключевых показателей здоровья и физической активности в одном месте.</p>
       <div class="stats-features">
-        <div class="feature-card" onclick="openModal('trainingModal')">
-          <h3>🏃‍♂️ Тренировки</h3>
-          <p>Фиксация активности, выбор шагов/км и недельные графики.</p>
-        </div>
-        <div class="feature-card" onclick="openModal('nutritionModal')">
-          <h3>🍏 Питание</h3>
-          <p>Контроль калорийности приёмов пищи с графиками.</p>
-        </div>
-        <div class="feature-card" onclick="openModal('bodyModal')">
-          <h3>⚖️ Замеры тела</h3>
-          <p>Мониторинг изменений веса, роста и калькулятор ИМТ.</p>
-        </div>
+        <div class="feature-card" onclick="openModal('trainingModal')"><h3>🏃‍♂️ Тренировки</h3><p>Фиксация активности, выбор шагов/км и недельные графики.</p></div>
+        <div class="feature-card" onclick="openModal('nutritionModal')"><h3>🍏 Питание</h3><p>Контроль калорийности приёмов пищи с графиками.</p></div>
+        <div class="feature-card" onclick="openModal('bodyModal')"><h3>⚖️ Замеры тела</h3><p>Мониторинг изменений веса, роста и калькулятор ИМТ.</p></div>
       </div>
     </div>
   </section>
@@ -253,13 +220,12 @@
       </form>
       <div class="auth-toggle" onclick="toggleAuthForms(false)">Нет аккаунта? Зарегистрироваться</div>
     </div>
-
     <div class="auth-card" id="register-block" style="display: none;">
-      <h2>Registration</h2>
+      <h2>Регистрация</h2>
       <form class="auth-form" id="registerForm">
         <input type="text" id="regName" placeholder="Ваше имя" required />
         <input type="email" id="regEmail" placeholder="Укажите Email" required />
-        <input type="password" id="regPass" placeholder="Придумайте пароль (от 6 символов)" required />
+        <input type="password" id="regPass" placeholder="Придумайте пароль" required />
         <input type="password" id="regPassConfirm" placeholder="Повторите пароль" required />
         <button type="submit">Создать аккаунт</button>
       </form>
@@ -273,7 +239,6 @@
       <div class="pane-left">
         <div class="donut" id="trainingDonut"><div class="donut-value" id="trainingPercent">0%</div></div>
         <h4 style="margin-bottom: 15px;">Цель недели: 32 000 шагов</h4>
-        
         <div class="chart-area" style="height: 180px;">
           <div class="grid-line" style="top:30px;"><span>8к</span></div>
           <div class="grid-line" style="top:80px;"><span>4к</span></div>
@@ -292,21 +257,17 @@
         <div class="toolbar">
           <input id="trainingNameInput" type="text" placeholder="Упражнение" style="width:140px;" />
           <input id="trainingValueInput" type="number" placeholder="Кол-во" style="width:80px;" />
-          <select id="trainingUnitInput">
-            <option value="шаги">шаги</option>
-            <option value="км">км</option>
-          </select>
+          <select id="trainingUnitInput"><option value="шаги">шаги</option><option value="км">км</option></select>
           <input id="trainingDateInput" type="date" />
           <button onclick="addTraining()">+</button>
-          <button onclick="clearData('training')">Очистить</button>
+          <button onclick="clearCollection('training')">Очистить все</button>
         </div>
         <div class="table-responsive">
           <table class="section-table" id="trainingTable">
-            <thead><tr><th>Активность</th><th>Результат</th><th>Ед. изм.</th><th>Дата</th></tr></thead>
+            <thead><tr><th>Активность</th><th>Результат</th><th>Ед. изм.</th><th>Дата</th><th>Действие</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
-        <div class="row-actions"><button onclick="removeLast('training')">Удалить последнюю строку</button></div>
       </div>
     </div>
   </div>
@@ -334,15 +295,14 @@
           <input id="dinnerInput" type="number" placeholder="Ужин" style="width:75px;" />
           <input id="nutritionDateInput" type="date" />
           <button onclick="addNutrition()">+</button>
-          <button onclick="clearData('nutrition')">Очистить</button>
+          <button onclick="clearCollection('nutrition')">Очистить все</button>
         </div>
         <div class="table-responsive">
           <table class="section-table" id="nutritionTable">
-            <thead><tr><th>Завтрак</th><th>Обед</th><th>Ужин</th><th>Дата</th></tr></thead>
+            <thead><tr><th>Завтрак</th><th>Обед</th><th>Ужин</th><th>Дата</th><th>Действие</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
-        <div class="row-actions"><button onclick="removeLast('nutrition')">Удалить последнюю строку</button></div>
       </div>
     </div>
   </div>
@@ -364,15 +324,14 @@
           <input id="targetWeightInput" type="number" step="0.1" placeholder="Цель (кг)" style="width:85px;" />
           <input id="bodyDateInput" type="date" />
           <button onclick="addBody()">+</button>
-          <button onclick="clearData('body')">Очистить</button>
+          <button onclick="clearCollection('body')">Очистить все</button>
         </div>
         <div class="table-responsive">
           <table class="section-table" id="bodyTable">
-            <thead><tr><th>Вес (кг)</th><th>Рост (см)</th><th>Желаемый (кг)</th><th>Дата</th></tr></thead>
+            <thead><tr><th>Вес (кг)</th><th>Рост (см)</th><th>Желаемый (кг)</th><th>Дата</th><th>Действие</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
-        <div class="row-actions"><button onclick="removeLast('body')">Удалить последнюю строку</button></div>
       </div>
     </div>
   </div>
@@ -381,7 +340,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, collection, addDoc, onSnapshot, query, orderBy, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -395,11 +354,11 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app); // Подключаем Firestore вместо getDatabase
+    const db = getFirestore(app);
     const auth = getAuth(app);
 
     let currentUser = null;
-    let dbUnsubscribe = null;
+    let unsubscribes = [];
 
     let state = {
       training: [],
@@ -413,44 +372,26 @@
       const headerBtn = document.getElementById('headerAuthBtn');
       const mobileBtn = document.getElementById('mobileAuthBtn');
       
-      if (dbUnsubscribe) {
-        dbUnsubscribe(); // Отписываемся от старого слушателя при смене юзера
-        dbUnsubscribe = null;
-      }
+      // Сбрасываем старые подписки на коллекции
+      unsubscribes.forEach(unsub => unsub());
+      unsubscribes = [];
 
       if (user) {
-        const textOut = `Выйти (${user.email.split('@')[0]})`;
-        headerBtn.textContent = textOut;
-        headerBtn.style.background = "#ffcccc";
-        headerBtn.style.borderColor = "#ff9999";
-
+        headerBtn.textContent = `Выйти (${user.email.split('@')[0]})`;
+        headerBtn.style.background = "#ffcccc"; headerBtn.style.borderColor = "#ff9999";
         mobileBtn.textContent = "🚪 Выход";
-        mobileBtn.style.background = "#ffcccc";
-        mobileBtn.style.borderColor = "#ff9999";
+        mobileBtn.style.background = "#ffcccc"; mobileBtn.style.borderColor = "#ff9999";
         
-        // СЛУШАЕМ ДОКУМЕНТ В КОЛЛЕКЦИИ default
-        const docRef = doc(db, "default", user.uid, "fitData", "state");
-        dbUnsubscribe = onSnapshot(docRef, (snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.data();
-            state.training = data.training || [];
-            state.nutrition = data.nutrition || [];
-            state.body = data.body || [];
-          } else {
-            state.training = []; state.nutrition = []; state.body = [];
-          }
-          renderAll();
-        }, (err) => {
-          console.error("Ошибка чтения Firestore:", err);
-        });
+        // Подписываемся на каждую ПОДКОЛЛЕКЦИЮ отдельно с сортировкой по дате
+        setupCollectionListener('training');
+        setupCollectionListener('nutrition');
+        setupCollectionListener('body');
+
       } else {
         headerBtn.textContent = "Вход / Регистрация";
-        headerBtn.style.background = "#d6f1dc";
-        headerBtn.style.borderColor = "#6175ca";
-
+        headerBtn.style.background = "#d6f1dc"; headerBtn.style.borderColor = "#6175ca";
         mobileBtn.textContent = "👤 Вход";
-        mobileBtn.style.background = "#d6f1dc";
-        mobileBtn.style.borderColor = "#6175ca";
+        mobileBtn.style.background = "#d6f1dc"; mobileBtn.style.borderColor = "#6175ca";
         
         state.training = []; state.nutrition = []; state.body = [];
         state.selectedNutritionIndex = 0;
@@ -458,98 +399,140 @@
       }
     });
 
-    // СИНХРОНИЗАЦИЯ С КОЛЛЕКЦИЕЙ default В FIRESTORE
-    function syncWithFirebase() {
-      if (!currentUser) return showToast("Ошибка: Вы не авторизованы!");
+    function setupCollectionListener(key) {
+      const colRef = collection(db, "default", currentUser.uid, key);
+      const q = query(colRef, orderBy("date", "asc"));
       
-      const docRef = doc(db, "default", currentUser.uid, "fitData", "state");
-      setDoc(docRef, {
-        training: state.training,
-        nutrition: state.nutrition,
-        body: state.body
-      })
-      .catch(err => {
-        console.error(err);
-        showToast("Ошибка синхронизации с Firestore");
-      });
+      const unsub = onSnapshot(q, (snapshot) => {
+        state[key] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (key === 'nutrition' && state.nutrition.length > 0) {
+          state.selectedNutritionIndex = state.nutrition.length - 1;
+        }
+        renderAll();
+      }, (err) => console.error(`Ошибка чтения подколлекции ${key}:`, err));
+      
+      unsubscribes.push(unsub);
     }
 
+    // Добавление новой записи в конкретную подколлекцию
+    async function addRecord(key, data) {
+      if (!currentUser) return showToast("Ошибка: Вы не авторизованы!");
+      try {
+        const colRef = collection(db, "default", currentUser.uid, key);
+        await addDoc(colRef, data);
+        showToast("Запись добавлена!");
+      } catch (err) {
+        console.error(err);
+        showToast("Ошибка сохранения в Firestore");
+      }
+    }
+
+    // Обновление отдельного поля в документе подколлекции
+    window.updateField = async function(key, docId, field, value) {
+      if (!currentUser) return;
+      try {
+        const docRef = doc(db, "default", currentUser.uid, key, docId);
+        await updateDoc(docRef, { [field]: value });
+      } catch (err) {
+        console.error(err);
+        showToast("Ошибка обновления");
+      }
+    }
+
+    // Удаление конкретного документа
+    window.deleteRecord = async function(key, docId) {
+      if (!currentUser) return;
+      if (!confirm("Удалить эту запись?")) return;
+      try {
+        const docRef = doc(db, "default", currentUser.uid, key, docId);
+        await deleteDoc(docRef);
+        showToast("Запись удалена");
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Очистка всей подколлекции
+    window.clearCollection = async function(key) {
+      if (!currentUser) return;
+      if (!confirm(`Очистить весь список в ${key}?`)) return;
+      try {
+        const colRef = collection(db, "default", currentUser.uid, key);
+        const snapshot = await getDocs(colRef);
+        const promises = snapshot.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(promises);
+        showToast("Подколлекция очищена");
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    window.addTraining = function() {
+      const name = document.getElementById('trainingNameInput').value.trim();
+      const value = document.getElementById('trainingValueInput').value.trim();
+      const unit = document.getElementById('trainingUnitInput').value;
+      const date = document.getElementById('trainingDateInput').value;
+      if(!name || !value || !date) return showToast('Заполните все поля');
+      addRecord('training', { name, value, unit, date });
+    }
+
+    window.addNutrition = function() {
+      const breakfast = document.getElementById('breakfastInput').value.trim() || "0";
+      const lunch = document.getElementById('lunchInput').value.trim() || "0";
+      const dinner = document.getElementById('dinnerInput').value.trim() || "0";
+      const date = document.getElementById('nutritionDateInput').value;
+      if(!date) return showToast('Укажите дату питания');
+      addRecord('nutrition', { breakfast, lunch, dinner, date });
+    }
+
+    window.addBody = function() {
+      const current = document.getElementById('currentWeightInput').value.trim();
+      const height = document.getElementById('currentHeightInput').value.trim();
+      const target = document.getElementById('targetWeightInput').value.trim();
+      const date = document.getElementById('bodyDateInput').value;
+      if(!current || !height || !date) return showToast('Заполните вес, рост и дату');
+      addRecord('body', { current, height, target, date });
+    }
+
+    // Роутинг Авторизации
     window.handleHeaderAuthClick = function() {
       if (currentUser) {
-        signOut(auth).then(() => {
-          showToast("Вы вышли из аккаунта.");
-          switchTab('home');
-        }).catch(err => showToast("Ошибка при выходе"));
+        signOut(auth).then(() => { showToast("Вы вышли из аккаунта."); switchTab('home'); }).catch(() => showToast("Ошибка выхода"));
       } else {
         switchTab('auth-tab');
       }
     }
-
-    document.getElementById('mobileAuthBtn').onclick = function() {
-      window.handleHeaderAuthClick();
-    };
+    document.getElementById('mobileAuthBtn').onclick = () => window.handleHeaderAuthClick();
 
     document.getElementById('registerForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const name = document.getElementById('regName').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const pass = document.getElementById('regPass').value;
-      const passConfirm = document.getElementById('regPassConfirm').value;
-
-      if (!name) return showToast('Укажите имя!');
-      if (pass !== passConfirm) return showToast('Пароли не совпадают!');
-      if (pass.length < 6) return showToast('Пароль должен быть от 6 символов!');
-
-      createUserWithEmailAndPassword(auth, email, pass)
-        .then((userCredential) => {
-          const uid = userCredential.user.uid;
-          
-          // ЗАПИСЬ ПРОФИЛЯ В КОЛЛЕКЦИЮ default
-          const profileRef = doc(db, "default", uid, "profile", "info");
-          setDoc(profileRef, {
-            name: name, email: email, createdAt: new Date().toISOString()
-          }).then(() => {
-            showToast('Аккаунт успешно создан!');
-            switchTab('home');
-            document.getElementById('registerForm').reset();
-          });
-        })
-        .catch((error) => {
-          if (error.code === 'auth/email-already-in-use') showToast('Этот Email занят!');
-          else showToast(`Ошибка: ${error.message}`);
-        });
+      if (pass.length < 6) return showToast('Пароль от 6 символов!');
+      createUserWithEmailAndPassword(auth, email, pass).then((cred) => {
+        setDoc(doc(db, "default", cred.user.uid, "profile", "info"), { name, email, createdAt: new Date().toISOString() });
+        showToast('Аккаунт создан!'); switchTab('home');
+      }).catch(err => showToast(err.message));
     });
 
     document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
-      const pass = document.getElementById('loginPass').value;
-
-      signInWithEmailAndPassword(auth, email, pass)
-        .then(() => {
-          showToast('Вы успешно вошли.');
-          switchTab('home');
-          document.getElementById('loginForm').reset();
-        })
-        .catch(() => {
-          showToast('Неверный аккаунт или пароль!');
-        });
+      signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value.trim(), document.getElementById('loginPass').value)
+        .then(() => { showToast('Успешный вход.'); switchTab('home'); })
+        .catch(() => showToast('Ошибка входа!'));
     });
 
-    window.switchTab = function(tabId) {
+    window.switchTab = function(id) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      const activeTab = document.getElementById(tabId);
-      if(activeTab) activeTab.classList.add('active');
-
+      if(document.getElementById(id)) document.getElementById(id).classList.add('active');
       document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
-      if (tabId === 'home') {
-        document.getElementById('mNavHome').classList.add('active');
-      }
+      if (id === 'home') document.getElementById('mNavHome').classList.add('active');
     }
 
-    window.toggleAuthForms = function(showLogin) {
-      document.getElementById('login-block').style.display = showLogin ? 'block' : 'none';
-      document.getElementById('register-block').style.display = showLogin ? 'none' : 'block';
+    window.toggleAuthForms = function(s) {
+      document.getElementById('login-block').style.display = s ? 'block' : 'none';
+      document.getElementById('register-block').style.display = s ? 'none' : 'block';
     }
 
     window.openModal = function(id) {
@@ -559,121 +542,37 @@
       if (id === 'bodyModal') document.getElementById('mNavBody').classList.add('active');
 
       const modal = document.getElementById(id);
-      modal.style.display = 'flex';
-      setTimeout(() => modal.classList.add('show'), 10);
+      modal.style.display = 'flex'; setTimeout(() => modal.classList.add('show'), 10);
       
-      const boxes = {
-        'trainingModal': 'trainingContentBox',
-        'nutritionModal': 'nutritionContentBox',
-        'bodyModal': 'bodyContentBox'
-      };
-
-      const contentBox = document.getElementById(boxes[id]);
-      if (contentBox) {
-        if (!currentUser) {
-          contentBox.style.opacity = '0.25';
-          contentBox.style.pointerEvents = 'none';
-          showToast("Пожалуйста, авторизуйтесь для доступа к дневнику.");
-        } else {
-          contentBox.style.opacity = '1';
-          contentBox.style.pointerEvents = 'all';
-        }
+      const boxId = id === 'trainingModal' ? 'trainingContentBox' : id === 'nutritionModal' ? 'nutritionContentBox' : 'bodyContentBox';
+      const box = document.getElementById(boxId);
+      if(box) {
+        box.style.opacity = currentUser ? '1' : '0.25';
+        box.style.pointerEvents = currentUser ? 'all' : 'none';
+        if(!currentUser) showToast("Пожалуйста, авторизуйтесь.");
       }
       renderAll();
     }
     
     window.closeModal = function(id) {
       const modal = document.getElementById(id);
-      modal.classList.remove('show');
-      setTimeout(() => modal.style.display = 'none', 250);
-      const activeTab = document.querySelector('.tab-content.active');
-      if (activeTab && activeTab.id === 'home') {
+      modal.classList.remove('show'); setTimeout(() => modal.style.display = 'none', 250);
+      if (document.querySelector('.tab-content.active')?.id === 'home') {
         document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
         document.getElementById('mNavHome').classList.add('active');
       }
     }
-    window.closeModalOnBackdrop = function(e) {
-      if(e.target.classList.contains('modal')) closeModal(e.target.id);
-    }
-
-    window.showToast = function(msg) {
-      const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-      clearTimeout(window.tTimer); window.tTimer = setTimeout(() => t.classList.remove('show'), 2500);
-    }
-    
+    window.closeModalOnBackdrop = (e) => { if(e.target.classList.contains('modal')) closeModal(e.target.id); }
+    window.showToast = (msg) => { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(window.tTimer); window.tTimer = setTimeout(() => t.classList.remove('show'), 2500); }
     function fmtDate(d) { if(!d) return ''; const p = d.split('-'); return p.length===3 ? `${p[2]}.${p[1]}.${p[0]}` : d; }
     function pNum(v) { return parseFloat(String(v).replace(/[^\d.]/g, '').replace(',', '.')) || 0; }
 
     function createCell(text, onSave) {
       const el = document.createElement('div'); el.className = 'editable-cell';
-      el.contentEditable = currentUser ? true : false; 
-      el.textContent = text || '';
+      el.contentEditable = !!currentUser; el.textContent = text || '';
       el.addEventListener('blur', () => onSave(el.textContent.trim()));
       el.addEventListener('keydown', e => { if(e.key === 'Enter') { e.preventDefault(); el.blur(); } });
       return el;
-    }
-
-    function updateCharts() {
-      let totalStepsCalculated = 0;
-      let weeklyStepsDistribution = [0, 0, 0, 0, 0, 0, 0];
-
-      if (state.training && state.training.length) {
-        state.training.forEach(row => {
-          let valueInSteps = pNum(row.value);
-          if (row.unit === 'км') valueInSteps = Math.round(valueInSteps * 1250);
-          totalStepsCalculated += valueInSteps;
-
-          if (row.date) {
-            const dateObj = new Date(row.date);
-            let dayOfWeek = dateObj.getDay(); 
-            let normalizedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1; 
-            if (!isNaN(normalizedDay)) weeklyStepsDistribution[normalizedDay] += valueInSteps;
-          }
-        });
-      }
-
-      const percent = Math.min(100, Math.round((totalStepsCalculated / 32000) * 100));
-      const donutEl = document.getElementById('trainingDonut');
-      if (donutEl) donutEl.style.background = `conic-gradient(var(--blue-dark) ${percent * 3.6}deg, #d5d5d5 0deg)`;
-      const percentEl = document.getElementById('trainingPercent');
-      if (percentEl) percentEl.textContent = `${percent}%`;
-
-      for (let i = 0; i < 7; i++) {
-        const dayValue = weeklyStepsDistribution[i];
-        const valEl = document.getElementById(`wd-${i+1}`);
-        const barEl = document.getElementById(`wb-${i+1}`);
-        if (valEl) valEl.textContent = dayValue >= 1000 ? (dayValue/1000).toFixed(1) + 'к' : dayValue;
-        if (barEl) barEl.style.height = `${Math.max(2, Math.min(110, (dayValue / 8000) * 110))}px`;
-      }
-
-      const row = state.nutrition[state.selectedNutritionIndex] || { breakfast: 0, lunch: 0, dinner: 0, date: '' };
-      ['breakfast', 'lunch', 'dinner'].forEach(k => {
-        const val = pNum(row[k]);
-        const valEl = document.getElementById(`${k}Value`);
-        const barEl = document.getElementById(`${k}Bar`);
-        if (valEl) valEl.textContent = val;
-        if (barEl) barEl.style.height = `${Math.max(2, Math.min(260, (val / 900) * 260))}px`;
-      });
-      const nutrDateEl = document.getElementById('nutritionSelectedDate');
-      if (nutrDateEl) nutrDateEl.textContent = row.date ? `Данные за ${fmtDate(row.date)}` : 'Выберите дату';
-
-      if (state.body && state.body.length > 0) {
-        const lastBody = state.body[state.body.length - 1];
-        const w = pNum(lastBody.current);
-        const h = pNum(lastBody.height) / 100;
-        if (w > 0 && h > 0) {
-          const bmi = (w / (h * h)).toFixed(1);
-          document.getElementById('bmiValue').textContent = bmi;
-          let status = "Норма";
-          if (bmi < 18.5) status = "Дефицит массы";
-          else if (bmi >= 25 && bmi < 30) status = "Избыточный вес";
-          else if (bmi >= 30) status = "Ожирение";
-          document.getElementById('bmiStatus').textContent = status;
-        }
-      } else {
-        document.getElementById('bmiValue').textContent = "--.-";
-        document.getElementById('bmiStatus').textContent = "Нет данных";
-      }
     }
 
     function renderTable(id, callback) {
@@ -682,81 +581,86 @@
     }
 
     function renderAll() {
-      renderTable('training', (row, idx) => {
+      renderTable('training', (row) => {
         const tr = document.createElement('tr');
-        tr.insertCell().appendChild(createCell(row.name, v => { state.training[idx].name = v; syncWithFirebase(); }));
-        tr.insertCell().appendChild(createCell(row.value, v => { state.training[idx].value = v; syncWithFirebase(); }));
-        tr.insertCell().appendChild(createCell(row.unit || 'шаги', v => { state.training[idx].unit = v; syncWithFirebase(); }));
-        tr.insertCell().appendChild(createCell(fmtDate(row.date), v => { state.training[idx].date = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.name, v => updateField('training', row.id, 'name', v)));
+        tr.insertCell().appendChild(createCell(row.value, v => updateField('training', row.id, 'value', v)));
+        tr.insertCell().appendChild(createCell(row.unit, v => updateField('training', row.id, 'unit', v)));
+        tr.insertCell().appendChild(createCell(fmtDate(row.date), v => updateField('training', row.id, 'date', v)));
+        const delBtn = document.createElement('button'); delBtn.textContent = '❌'; delBtn.style.padding = '2px 6px'; delBtn.onclick = () => deleteRecord('training', row.id);
+        tr.insertCell().appendChild(delBtn);
         return tr;
       });
 
       renderTable('nutrition', (row, idx) => {
         const tr = document.createElement('tr');
         ['breakfast', 'lunch', 'dinner'].forEach(k => {
-          tr.insertCell().appendChild(createCell(row[k], v => { state.nutrition[idx][k] = v; syncWithFirebase(); }));
+          tr.insertCell().appendChild(createCell(row[k], v => updateField('nutrition', row.id, k, v)));
         });
         const btn = document.createElement('button'); btn.className = `date-pill ${idx === state.selectedNutritionIndex ? 'active' : ''}`;
         btn.textContent = fmtDate(row.date) || '---';
-        btn.onclick = () => { if(currentUser) { state.selectedNutritionIndex = idx; renderAll(); } };
+        btn.onclick = () => { state.selectedNutritionIndex = idx; updateCharts(); document.querySelectorAll('#nutritionTable .date-pill').forEach((b,i)=>b.classList.toggle('active', i===idx)); };
         tr.insertCell().appendChild(btn);
+        const delBtn = document.createElement('button'); delBtn.textContent = '❌'; delBtn.style.padding = '2px 6px'; delBtn.onclick = () => deleteRecord('nutrition', row.id);
+        tr.insertCell().appendChild(delBtn);
         return tr;
       });
 
-      renderTable('body', (row, idx) => {
+      renderTable('body', (row) => {
         const tr = document.createElement('tr');
-        tr.insertCell().appendChild(createCell(row.current, v => { state.body[idx].current = v; syncWithFirebase(); }));
-        tr.insertCell().appendChild(createCell(row.height, v => { state.body[idx].height = v; syncWithFirebase(); }));
-        tr.insertCell().appendChild(createCell(row.target, v => { state.body[idx].target = v; syncWithFirebase(); }));
-        tr.insertCell().appendChild(createCell(fmtDate(row.date), v => { state.body[idx].date = v; syncWithFirebase(); }));
+        tr.insertCell().appendChild(createCell(row.current, v => updateField('body', row.id, 'current', v)));
+        tr.insertCell().appendChild(createCell(row.height, v => updateField('body', row.id, 'height', v)));
+        tr.insertCell().appendChild(createCell(row.target, v => updateField('body', row.id, 'target', v)));
+        tr.insertCell().appendChild(createCell(fmtDate(row.date), v => updateField('body', row.id, 'date', v)));
+        const delBtn = document.createElement('button'); delBtn.textContent = '❌'; delBtn.style.padding = '2px 6px'; delBtn.onclick = () => deleteRecord('body', row.id);
+        tr.insertCell().appendChild(delBtn);
         return tr;
       });
 
       updateCharts();
     }
 
-    window.addTraining = function() {
-      if(!currentUser) return;
-      const name = document.getElementById('trainingNameInput').value.trim();
-      const value = document.getElementById('trainingValueInput').value.trim();
-      const unit = document.getElementById('trainingUnitInput').value;
-      const date = document.getElementById('trainingDateInput').value;
-      if(!name && !value && !date) return showToast('Заполните поля');
-      state.training.push({ name, value, unit, date }); syncWithFirebase();
-    }
+    function updateCharts() {
+      let totalSteps = 0, weeklySteps = [0,0,0,0,0,0,0];
+      state.training.forEach(row => {
+        let val = pNum(row.value); if (row.unit === 'км') val = Math.round(val * 1250);
+        totalSteps += val;
+        if (row.date) {
+          let day = new Date(row.date).getDay();
+          weeklySteps[day === 0 ? 6 : day - 1] += val;
+        }
+      });
 
-    window.addNutrition = function() {
-      if(!currentUser) return;
-      const breakfast = document.getElementById('breakfastInput').value.trim();
-      const lunch = document.getElementById('lunchInput').value.trim();
-      const dinner = document.getElementById('dinnerInput').value.trim();
-      const date = document.getElementById('nutritionDateInput').value;
-      state.nutrition.push({ breakfast, lunch, dinner, date });
-      state.selectedNutritionIndex = state.nutrition.length - 1;
-      syncWithFirebase();
-    }
+      const pct = Math.min(100, Math.round((totalSteps / 32000) * 100));
+      if(document.getElementById('trainingDonut')) document.getElementById('trainingDonut').style.background = `conic-gradient(var(--blue-dark) ${pct * 3.6}deg, #d5d5d5 0deg)`;
+      if(document.getElementById('trainingPercent')) document.getElementById('trainingPercent').textContent = `${pct}%`;
 
-    window.addBody = function() {
-      if(!currentUser) return;
-      const current = document.getElementById('currentWeightInput').value.trim();
-      const height = document.getElementById('currentHeightInput').value.trim();
-      const target = document.getElementById('targetWeightInput').value.trim();
-      const date = document.getElementById('bodyDateInput').value;
-      state.body.push({ current, height, target, date }); syncWithFirebase();
-    }
+      for (let i = 0; i < 7; i++) {
+        const v = weeklySteps[i];
+        if(document.getElementById(`wd-${i+1}`)) document.getElementById(`wd-${i+1}`).textContent = v >= 1000 ? (v/1000).toFixed(1)+'к' : v;
+        if(document.getElementById(`wb-${i+1}`)) document.getElementById(`wb-${i+1}`).style.height = `${Math.max(2, Math.min(110, (v / 8000) * 110))}px`;
+      }
 
-    window.removeLast = function(key) {
-      if(!currentUser || !state[key].length) return;
-      state[key].pop();
-      if(key === 'nutrition') state.selectedNutritionIndex = Math.max(0, state.nutrition.length - 1);
-      syncWithFirebase();
-    }
+      const nut = state.nutrition[state.selectedNutritionIndex] || { breakfast: 0, lunch: 0, dinner: 0, date: '' };
+      ['breakfast', 'lunch', 'dinner'].forEach(k => {
+        const v = pNum(nut[k]);
+        if(document.getElementById(`${k}Value`)) document.getElementById(`${k}Value`).textContent = v;
+        if(document.getElementById(`${k}Bar`)) document.getElementById(`${k}Bar`).style.height = `${Math.max(2, Math.min(260, (v / 900) * 260))}px`;
+      });
+      if(document.getElementById('nutritionSelectedDate')) document.getElementById('nutritionSelectedDate').textContent = nut.date ? `Данные за ${fmtDate(nut.date)}` : 'Выберите дату';
 
-    window.clearData = function(key) {
-      if(!currentUser) return;
-      state[key] = [];
-      if(key === 'nutrition') state.selectedNutritionIndex = 0;
-      syncWithFirebase();
+      if (state.body.length > 0) {
+        const last = state.body[state.body.length - 1];
+        const w = pNum(last.current), h = pNum(last.height) / 100;
+        if (w > 0 && h > 0) {
+          const bmi = (w / (h * h)).toFixed(1);
+          document.getElementById('bmiValue').textContent = bmi;
+          document.getElementById('bmiStatus').textContent = bmi < 18.5 ? "Дефицит массы" : bmi >= 25 ? (bmi < 30 ? "Избыточный вес" : "Ожирение") : "Норма";
+        }
+      } else {
+        document.getElementById('bmiValue').textContent = "--.-";
+        document.getElementById('bmiStatus').textContent = "Нет данных";
+      }
     }
   </script>
 </body>
